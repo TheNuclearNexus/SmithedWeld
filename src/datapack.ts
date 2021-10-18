@@ -5,6 +5,8 @@ import { MetaData } from "./metadata";
 import { asEnumerable } from "linq-es5";
 import { Rule, TargetSourceRule } from "./rules";
 
+const weldCategories = ['loot_tables','predicates','item_modifiers','dimension','dimension_type','worldgen','recipes']
+
 export class WeldDatapackBuilder extends DefaultDatapackBuilder {
     data: JSZip = null
     
@@ -14,7 +16,7 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
     }
 
     async mergeViaWeld(fileData: FileData, resolvedData: string[]) {
-        console.log('\n' + fileData.path)
+        // console.log('\n' + fileData.path)
         let baseTable = null
         if(fileData.namespace === 'minecraft') {
             const rawTable = this.data.file(fileData.path)
@@ -68,7 +70,7 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
 
         
         rules.forEach(r => {
-            console.log(`${r[1].type} -> ${r[1].target} [${r[1].target.length}]`)
+            // console.log(`${r[1].type} -> ${r[1].target} [${r[1].target.length}]`)
 
             newTable = r[1].handle(newTable, data[r[0]])
         })
@@ -81,7 +83,7 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
             if(fileData.category === 'tags') {
                 this.mergeTags(fileData, resolvedData);
             } 
-            else if (fileData.category === 'loot_tables') {
+            else if (weldCategories.includes(fileData.category)) {
                 await this.mergeViaWeld(fileData, resolvedData);
             } else {
                 this.finalZip.file(fileData.path, resolvedData[0]);
