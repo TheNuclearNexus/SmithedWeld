@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "ES2021",
+        "watch": false,
+        "lib": ["dom", "es2021"],
+        "outDir": "out",
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "module": "commonjs"
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
