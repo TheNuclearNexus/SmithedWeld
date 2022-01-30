@@ -6,7 +6,7 @@ import { Source, ValueSource } from "./sources";
 export interface RuleData {type: string, [key:string]: any}
 export class Rule {
     type: string = "";
-    conditions: Condition[] | null;
+    conditions: Condition[] = [];
     constructor(data: RuleData) {
         this.type = data["type"]
         if(data["conditions"] != null && data["conditions"].length != null) {
@@ -19,7 +19,7 @@ export class Rule {
         }
     }
 
-    static build(data: RuleData): Rule {
+    static build(data: RuleData): Rule|null {
         switch(data.type) {
             case 'smithed:prepend':
                 return new Prepend(data);
@@ -45,7 +45,7 @@ export class Rule {
             case 'smithed:insert':
                 return -1;
             default:
-                return null;
+                return 0;
         }
     }
 

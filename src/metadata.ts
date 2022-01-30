@@ -17,13 +17,16 @@ export class Priority {
 
 
 export class MetaData {
-    rules: Rule[]
+    rules: Rule[] = []
     priority: Priority
     constructor(data: any) {
         if(data["rules"] != null) {
             this.rules = []
             for(let r of data["rules"]) {
-                this.rules.push(Rule.build(r));
+                const rule = Rule.build(r)
+                if(rule != null) {
+                    this.rules.push(rule);
+                }
             }
         }
         if(data["priority"] != null) {
@@ -33,7 +36,7 @@ export class MetaData {
         }
     }
 
-    static buildFromRawJson(data: any): MetaData {
+    static buildFromRawJson(data: any): MetaData|null {
         if(data["__smithed__"] != null) {
             return new MetaData(data["__smithed__"]);
         }

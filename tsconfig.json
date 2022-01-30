@@ -1,12 +1,13 @@
 {
     "compilerOptions": {
-        "target": "ES2021",
+        "target": "es6",
         "watch": false,
         "lib": ["dom", "es2021"],
         "outDir": "out",
         "esModuleInterop": true,
         "moduleResolution": "node",
-        "module": "commonjs"
+        "module": "commonjs",
+        "strict": true
     },
     "exclude": [
         "node_modules"

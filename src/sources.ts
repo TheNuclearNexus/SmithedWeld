@@ -38,7 +38,9 @@ export class ReferenceSource extends Source {
 
     
     handle(sourceTable: {}): {} {
-        return PathFetcher.getDataFromPath(sourceTable, this.path);
+        const data = PathFetcher.getDataFromPath(sourceTable, this.path);
+    
+        return data != null ? data : {} 
     }
 }
 

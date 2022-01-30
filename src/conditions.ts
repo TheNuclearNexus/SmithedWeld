@@ -5,7 +5,7 @@ export class Condition {
         this.type = data["type"]
     }
 
-    static build(data: ConditionData): Condition {
+    static build(data: ConditionData): Condition|null {
         switch(data.type) {
             case 'smithed:pack_check':
                 return new PackCheckCondition(data);
@@ -26,7 +26,7 @@ export class PackCheckCondition extends Condition {
 }
 
 export class InvertedCondition extends Condition {
-    condition: Condition;
+    condition: Condition|null;
     constructor(data: ConditionData) {
         super(data)
         this.condition = Condition.build(data["condition"])

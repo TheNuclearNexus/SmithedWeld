@@ -1,7 +1,7 @@
 
 const arrayMatcher = /[A-Za-z]+(\[([A-Za-z0-9]+)?\])+/
 class PathFetcher {
-    static getDataFromPath(data:{}, path: string): {} {
+    static getDataFromPath(data:{}, path: string): {}|null {
         let segments = path.split('.');
 
         if(segments.length > 0)
@@ -18,7 +18,7 @@ class PathFetcher {
     }
 
 
-    private static fetchNext(data:{}, index: number, segments: string[]):{} {
+    private static fetchNext(data:{[key:string]:any}, index: number, segments: string[]):{}|null {
         // Determine if the current path segment is trying to index an array
         segments = PathFetcher.ifArrayPath(segments, index);
 
@@ -36,7 +36,7 @@ class PathFetcher {
         }
     }
 
-    private static atNext(data:{}, index: number, segments: string[], complete: (data: {}) => void) {
+    private static atNext(data:{[key:string]:any}, index: number, segments: string[], complete: (data: {}) => void) {
         // Determine if the current path segment is trying to index an array
         segments = PathFetcher.ifArrayPath(segments, index);
 
