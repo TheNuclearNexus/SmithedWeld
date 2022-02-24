@@ -1,4 +1,4 @@
-import { Rule } from "./rules";
+import { Rule } from "./rules.js";
 
 export class Priority {
     default: number = 0;

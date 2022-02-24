@@ -1,4 +1,4 @@
-import PathFetcher from "./pathFetcher";
+import PathFetcher from "./pathFetcher.js";
 
 export interface SourceData {type: string, [key:string]: any}
 export class Source {

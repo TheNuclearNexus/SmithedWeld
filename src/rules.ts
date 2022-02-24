@@ -1,7 +1,7 @@
 import { EventEmitter } from "stream";
-import { Condition } from "./conditions";
-import PathFetcher from "./pathFetcher";
-import { Source, ValueSource } from "./sources";
+import { Condition } from "./conditions.js";
+import PathFetcher from "./pathFetcher.js";
+import { Source, ValueSource } from "./sources.js";
 
 export interface RuleData {type: string, [key:string]: any}
 export class Rule {

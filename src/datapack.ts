@@ -1,10 +1,11 @@
-import DefaultDatapackBuilder from "slimeball/out/datapack";
-import { FileData, parseData } from "slimeball/out/util";
+import DefaultDatapackBuilder from "slimeball/out/datapack.js";
+import { FileData, parseData } from "slimeball/out/util.js";
 import JSZip from 'jszip'
-import { MetaData } from "./metadata";
+import { MetaData } from "./metadata.js";
 import { asEnumerable } from "linq-es5";
-import { Rule, TargetSourceRule } from "./rules";
-const fetch = require('node-fetch')
+import { Rule, TargetSourceRule } from "./rules.js";
+import { TextReader } from "@zip.js/zip.js";
+import fetch from 'node-fetch'
 
 const weldCategories = ['loot_tables','predicates','item_modifiers','dimension','dimension_type','worldgen','recipes']
 let cachedData: {[key: string]: {
@@ -23,6 +24,7 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
     async mergeViaWeld(fileData: FileData, resolvedData: string[]) {
         let baseTable = null
         if(fileData.namespace === 'minecraft') {
+            this.onUpdate('Fetch vanilla loot table')
             if(cachedData[this.version] !== undefined && cachedData[this.version][fileData.path] !== undefined) {
                 baseTable = cachedData[this.version][fileData.path]
             }
@@ -34,6 +36,7 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
             }
         }
 
+        this.onUpdate('Load loot tables')
         let data: {}[] = [];
         for(let d of resolvedData) {
             const parsedData = parseData(d);
@@ -53,8 +56,9 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
             baseTable = data.shift()
         }
 
+        this.onUpdate('Apply rules')
         let newTable = this.applyRules(baseTable, data);
-        this.finalZip.file(fileData.path, JSON.stringify(newTable, null, 2));
+        await this.finalZip.add(fileData.path, new TextReader(JSON.stringify(newTable, null, 2)));
         this.fileMap[fileData.namespace][fileData.category][fileData.path] = [];
     }
 
@@ -94,12 +98,12 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
             else if (weldCategories.includes(fileData.category)) {
                 await this.mergeViaWeld(fileData, resolvedData);
             } else {
-                this.finalZip.file(fileData.path, resolvedData[0]);
+                await this.finalZip.add(fileData.path, new TextReader(resolvedData[0]));
             }
         }
 
         const onFailure = (resolvedData: string[]) => {
-            this.finalZip.file(fileData.path, resolvedData[0]);
+            this.finalZip.add(fileData.path, new TextReader(resolvedData[0]));
             this.fileMap[fileData.namespace][fileData.category][fileData.path] = [];
         }
         await this.ifAnyDifferent(fileData, occurences, onSuccess, onFailure)

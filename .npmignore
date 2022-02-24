@@ -1,0 +1,10 @@
+node_modules/
+.vscode/
+temp/
+packs/
+src/
+test/
+
+package-lock.json
+datapack.zip
+resourcepack.zip
