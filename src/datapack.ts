@@ -59,7 +59,6 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
         this.onUpdate('Apply rules')
         let newTable = this.applyRules(baseTable, data);
         await this.finalZip.add(fileData.path, new TextReader(JSON.stringify(newTable, null, 2)));
-        this.fileMap[fileData.namespace][fileData.category][fileData.path] = [];
     }
 
     private applyRules(baseTable: any, data: {}[]) {
@@ -93,19 +92,22 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
     override async handleConflict(fileData: FileData, occurences: number[]) {
         const onSuccess = async (resolvedData: string[]) => {
             if(fileData.category === 'tags') {
-                this.mergeTags(fileData, resolvedData);
+                await this.mergeTags(fileData, resolvedData);
+                return true;
             } 
             else if (weldCategories.includes(fileData.category)) {
                 await this.mergeViaWeld(fileData, resolvedData);
+                return true;
             } else {
                 await this.finalZip.add(fileData.path, new TextReader(resolvedData[0]));
+                return false;
             }
         }
 
         const onFailure = (resolvedData: string[]) => {
             this.finalZip.add(fileData.path, new TextReader(resolvedData[0]));
-            this.fileMap[fileData.namespace][fileData.category][fileData.path] = [];
+            return false;
         }
-        await this.ifAnyDifferent(fileData, occurences, onSuccess, onFailure)
+        return await this.ifAnyDifferent(fileData, occurences, onSuccess, onFailure)
     }
 }
