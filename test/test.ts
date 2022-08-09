@@ -21,7 +21,7 @@ export function testDatapacks() {
 
     ddb.loadBuffers(buffers).then(() => {
         ddb.build().then(async (result: BuildResult) => {
-            const blob: Blob = await result.zip.close()
+            const blob: Blob = await result.zip.export()
             fs.writeFileSync('datapack.zip', Buffer.from(await blob.arrayBuffer()));
             console.log('Datapack Conflicts: ' + result.conflicts)
         })

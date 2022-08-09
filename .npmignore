@@ -8,3 +8,5 @@ test/
 package-lock.json
 datapack.zip
 resourcepack.zip
+
+*.tgz

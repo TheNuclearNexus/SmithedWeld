@@ -1,10 +1,9 @@
 import DefaultDatapackBuilder from "slimeball/out/datapack.js";
-import { FileData, parseData } from "slimeball/out/util.js";
+import { FileData, FileOccurence, parseData,  } from "slimeball/out/util.js";
 import JSZip from 'jszip'
 import { MetaData } from "./metadata.js";
 import { asEnumerable } from "linq-es5";
 import { Rule, TargetSourceRule } from "./rules.js";
-import { TextReader } from "@zip.js/zip.js";
 import fetch from 'node-fetch'
 
 const weldCategories = ['loot_tables','predicates','item_modifiers','dimension','dimension_type','worldgen','recipes']
@@ -45,6 +44,10 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
                 data.push(parsedData)
             }
         }
+        if (data.length === 0) {
+            await this.finalZip.addFile(fileData.path, Buffer.from(resolvedData[0]));
+            return;
+        }
 
         data = asEnumerable(data).OrderBy(d => {
             const meta = MetaData.buildFromRawJson(d)
@@ -58,7 +61,7 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
 
         this.onUpdate('Apply rules')
         let newTable = this.applyRules(baseTable, data);
-        await this.finalZip.add(fileData.path, new TextReader(JSON.stringify(newTable, null, 2)));
+        await this.finalZip.addFile(fileData.path, Buffer.from(JSON.stringify(newTable, null, 2)));
     }
 
     private applyRules(baseTable: any, data: {}[]) {
@@ -89,7 +92,7 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
         return newTable;
     }
 
-    override async handleConflict(fileData: FileData, occurences: number[]) {
+    override async handleConflict(fileData: FileData, occurences: FileOccurence[]) {
         const onSuccess = async (resolvedData: string[]) => {
             if(fileData.category === 'tags') {
                 await this.mergeTags(fileData, resolvedData);
@@ -99,13 +102,13 @@ export class WeldDatapackBuilder extends DefaultDatapackBuilder {
                 await this.mergeViaWeld(fileData, resolvedData);
                 return true;
             } else {
-                await this.finalZip.add(fileData.path, new TextReader(resolvedData[0]));
+                await this.finalZip.addFile(fileData.path, Buffer.from(resolvedData[0]));
                 return false;
             }
         }
 
         const onFailure = (resolvedData: string[]) => {
-            this.finalZip.add(fileData.path, new TextReader(resolvedData[0]));
+            this.finalZip.addFile(fileData.path, Buffer.from(resolvedData[0]));
             return false;
         }
         return await this.ifAnyDifferent(fileData, occurences, onSuccess, onFailure)
